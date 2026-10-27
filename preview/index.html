@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample Mobile App Preview</title>
+<style>
+  :root { --primary: #512BD4; --danger: #D32F2F; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: #e9e7f2; font-family: Roboto, "Segoe UI", Arial, sans-serif;
+  }
+  .phone {
+    width: 380px; height: 780px; background: #111; border-radius: 44px; padding: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.35);
+  }
+  .screen {
+    width: 100%; height: 100%; background: #fff; border-radius: 32px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .status { height: 28px; background: var(--primary); color: #fff; font-size: 12px;
+    display: flex; justify-content: space-between; align-items: center; padding: 0 22px; }
+  .appbar { background: var(--primary); color: #fff; font-size: 20px; font-weight: 500; padding: 14px 18px; }
+  .content { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+  .add { display: flex; gap: 8px; }
+  .add input { flex: 1; font-size: 16px; padding: 10px 4px; border: none; border-bottom: 2px solid #999; outline: none; }
+  .add input:focus { border-bottom-color: var(--primary); }
+  button { border: none; border-radius: 8px; padding: 8px 14px; color: #fff; background: var(--primary);
+    font-size: 14px; cursor: pointer; }
+  button:disabled { opacity: .45; cursor: default; }
+  button.del { background: var(--danger); }
+  ul { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
+  li { display: flex; align-items: center; gap: 10px; padding: 8px 4px; }
+  li input { width: 20px; height: 20px; accent-color: var(--primary); }
+  li span { flex: 1; font-size: 16px; }
+  li.done span { text-decoration: line-through; opacity: .5; }
+  .empty { text-align: center; color: #777; margin-top: 40px; }
+  .navbar { height: 44px; display: flex; justify-content: center; align-items: center; }
+  .navbar div { width: 120px; height: 5px; border-radius: 3px; background: #ccc; }
+  .note { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); font-size: 13px; color: #555; }
+</style>
+</head>
+<body>
+<div class="note">Browser preview of SampleMobileApp.apk (same UI as the Android app)</div>
+<div class="phone">
+  <div class="screen">
+    <div class="status"><span id="clock">9:41</span><span>▂▄▆ 🔋</span></div>
+    <div class="appbar">My Tasks</div>
+    <div class="content">
+      <div class="add">
+        <input id="newTitle" placeholder="Add a task...">
+        <button id="addBtn" disabled>Add</button>
+      </div>
+      <ul id="list"></ul>
+      <div id="empty" class="empty" hidden>No tasks yet.</div>
+    </div>
+    <div class="navbar"><div></div></div>
+  </div>
+</div>
+<script>
+  const items = [
+    { title: "Install .NET MAUI workload", done: false },
+    { title: "Run the app on an Android emulator", done: false },
+  ];
+  const list = document.getElementById("list");
+  const input = document.getElementById("newTitle");
+  const addBtn = document.getElementById("addBtn");
+  const empty = document.getElementById("empty");
+
+  function render() {
+    list.innerHTML = "";
+    items.forEach((item, i) => {
+      const li = document.createElement("li");
+      if (item.done) li.className = "done";
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.checked = item.done;
+      cb.onchange = () => { item.done = cb.checked; render(); };
+      const span = document.createElement("span");
+      span.textContent = item.title;
+      const del = document.createElement("button");
+      del.className = "del"; del.textContent = "Delete";
+      del.onclick = () => { items.splice(i, 1); render(); };
+      li.append(cb, span, del);
+      list.append(li);
+    });
+    empty.hidden = items.length > 0;
+  }
+
+  function add() {
+    const t = input.value.trim();
+    if (!t) return;
+    items.push({ title: t, done: false });
+    input.value = ""; addBtn.disabled = true; render();
+  }
+
+  input.oninput = () => { addBtn.disabled = !input.value.trim(); };
+  input.onkeydown = e => { if (e.key === "Enter") add(); };
+  addBtn.onclick = add;
+
+  const d = new Date();
+  document.getElementById("clock").textContent = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
+  render();
+</script>
+</body>
+</html>
